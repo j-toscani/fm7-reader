@@ -8,10 +8,10 @@ const message = Buffer.from('My KungFu is Good!');
 
 const client = dgram.createSocket('udp4');
 
-client.send(message, 0, message.length, PORT, HOST, function(err, bytes) {
+client.send(message, 0, message.length, PORT, HOST, sendMessage);
+
+function sendMessage(err: Error | null, bytes: number) {
   if (err) throw err;
   console.log('UDP message sent to ' + HOST +':'+ PORT);
   client.close();
-});
-
-console.log("sent message!")
+}
