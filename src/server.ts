@@ -11,4 +11,6 @@ server.on("listening", createOnListening(server));
 
 server.on("message", onMessage);
 
-server.bind(PORT, HOST);
+export function startServer() {
+  server.bind(PORT, HOST);
+}
