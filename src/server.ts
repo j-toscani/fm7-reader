@@ -5,7 +5,7 @@ import { createOnListening } from "./lib/handlerFactories";
 const server = dgram.createSocket("udp4");
 
 const PORT = 33333;
-const HOST = "127.0.0.1";
+const HOST = "0.0.0.0";
 
 server.on("listening", createOnListening(server));
 
