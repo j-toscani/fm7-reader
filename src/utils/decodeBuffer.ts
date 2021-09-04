@@ -4,7 +4,7 @@ export default function decodeBuffer(message: Buffer) {
   let byteToRead = 0;
   const decoder = createDecoder(message);
 
-  const decodedObject = base.map((option) => {
+  const decodedTuples = [base[0]].map((option) => {
     const step = parseInt(option.encoding.slice(1)) / 4;
     const value = decoder(option.encoding, byteToRead);
 
@@ -13,7 +13,8 @@ export default function decodeBuffer(message: Buffer) {
     return data;
   });
 
-  return Object.fromEntries(decodedObject);
+  // return Object.fromEntries(decodedObject);
+  return decodedTuples;
 }
 
 function createDecoder(message: Buffer) {
@@ -21,6 +22,8 @@ function createDecoder(message: Buffer) {
     switch (encoding) {
       case "f32":
         return message.readFloatBE(byteToRead);
+      case "s32":
+        return message.readInt32BE(byteToRead);
 
       default:
         return message.readFloatBE(byteToRead);

@@ -1,9 +1,9 @@
 import { RemoteInfo } from "dgram";
+import decodeBuffer from "../utils/decodeBuffer";
 
 export function onMessage(message: Buffer, remote: RemoteInfo) {
-  const mode = remote.size === 232 ? "sled" : "cardash";
-  const status = `${remote.address} : ${remote.port} - ${message.readFloatBE(
-    0
-  )}`;
+  const [readableMessage] = decodeBuffer(message);
+  const string = `${readableMessage[0]}: ${Boolean(readableMessage[1])}`
+  const status = `${remote.address} : ${remote.port} - ${string}`;
   console.log(status);
 }
