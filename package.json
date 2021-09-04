@@ -8,6 +8,7 @@
     "convert": "ts-node ./src/converter/index.ts",
     "watch": "tsc --watch",
     "start": "node ./dist",
+    "start:dev": "ts-node ./src/index.ts",
     "dev": "nodemon ./dist"
   },
   "repository": {

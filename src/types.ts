@@ -6,5 +6,8 @@ const all = {
   ...add,
 } as const;
 
-type V1 = typeof base;
-type V2 = typeof all;
+export type V1 = typeof base;
+export type V2 = typeof all;
+
+export type BufferKeysV1 = V1[number]["property"];
+export type BufferKeysV2 = V2[number]["property"];

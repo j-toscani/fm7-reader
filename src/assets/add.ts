@@ -25,5 +25,4 @@ export default [
   { encoding: "u8", property: "gear" },
   { encoding: "s8", property: "steer" },
   { encoding: "s8", property: "normalizedDrivingLine" },
-  { encoding: "s8", property: "normalizedAIBrakeDifference" },
 ] as const;
