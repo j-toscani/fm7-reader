@@ -46,4 +46,4 @@ Here, set the folowing Options:
 
 ## Status
 
-The Data stream gets outputted to the console but is unreadable
+The Data stream gets outputted to the console but is unreadable.
