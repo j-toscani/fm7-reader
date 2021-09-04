@@ -1,37 +1,41 @@
 import { RemoteInfo } from "dgram";
 import base from "../assets/base";
 import add from "../assets/add";
-import { BufferKeysV1, BufferKeysV2, V2 } from "../types";
+import { BufferKeysV1, BufferKeysV2, EncodingsV2, V2 } from "../types";
 
 const all = [...base, ...add];
 
 export function onMessage(message: Buffer, remote: RemoteInfo) {
-  const decodedBuffer = decodeBuffer(message, remote.size);
+  const decodedBuffer = decodeBuffer(message);
   const status = `${remote.address} : ${remote.port} - Game is running: ${decodedBuffer.isRaceOn}`;
   console.log(status);
 }
 
-export default function decodeBuffer(message: Buffer, maxSize: number) {
+export default function decodeBuffer(message: Buffer) {
   let byteToRead = 0;
-  const decoder = createDecoder(message, maxSize);
+  const decoder = createDecoder(message);
+  const toDecode = message.byteLength > 232 ? all : base;
 
-  const toDecode = maxSize > 232 ? all : base;
-  const decodedBuffer: { [key in BufferKeysV1 | BufferKeysV2]?: number } = {};
-
-  toDecode.forEach((option) => {
-    const step = parseInt(option.encoding.slice(1)) / 8;
+  const keyValuePairs = toDecode.map((option) => {
     const value = decoder(option, byteToRead);
+    byteToRead = getNextByteToRead(byteToRead, option.encoding);
 
-    decodedBuffer[option.property] = value;
-    byteToRead += step;
+    return [option.property, value];
   });
 
-  return decodedBuffer as { [key in BufferKeysV1 | BufferKeysV2]: number };
+  return Object.values(keyValuePairs) as unknown as {
+    [key in BufferKeysV1 | BufferKeysV2]: number;
+  };
 }
 
-function createDecoder(message: Buffer, maxSize: number) {
+function getNextByteToRead(prev: number, encoding: EncodingsV2) {
+  return prev + parseInt(encoding.slice(1)) / 8;
+}
+
+function createDecoder(message: Buffer) {
   return (option: V2[number], byteToRead: number) => {
-    if (byteToRead >= maxSize) {
+    if (byteToRead >= message.byteLength) {
+      console.error("Exceeded byte length!");
       return;
     }
 
