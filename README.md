@@ -3,7 +3,9 @@ A UDP-Streamreader written in NodeJS for Forza Motorsport 7
 
 ## Introduction
 
-This package creates a server to read Data from `Data-Out` - UDP-Stream from Forza Motorsport 7. It is documented here: https://forums.forzamotorsport.net/turn10_postst128499_Forza-Motorsport-7--Data-Out--feature-details.aspx?=. This Server needs to run on a seperate device.
+This package creates a server to read Data from `Data-Out` - UDP-Stream from Forza Motorsport 7. It is documented here: https://forums.forzamotorsport.net/turn10_postst128499_Forza-Motorsport-7--Data-Out--feature-details.aspx?=. This Server needs to run on a seperate device as the Data-Out does not work on `localhost`.
+
+**Note** If you are using WSL, and this server runs in WSL while the game runs on the Hostmachine you do not need a second device. As the server runs under a seperate IP, it can connect to it.
 
 It takes inspiration from the folowing Project: https://forums.forzamotorsport.net/turn10_postst128499_Forza-Motorsport-7--Data-Out--feature-details.aspx?=
 
