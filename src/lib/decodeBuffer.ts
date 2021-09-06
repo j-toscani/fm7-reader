@@ -1,7 +1,6 @@
 import { BufferKeysV1, BufferKeysV2, EncodingsV2, V1, V2 } from "../types";
 
-
-export default function decodeBuffer(message: Buffer, toDecode: V1| V2) {
+export default function decodeBuffer(message: Buffer, toDecode: V1 | V2) {
   let byteToRead = 0;
   const decoder = createDecoder(message);
 
@@ -12,7 +11,7 @@ export default function decodeBuffer(message: Buffer, toDecode: V1| V2) {
     return [option.property, value];
   });
 
-  return Object.values(keyValuePairs) as unknown as {
+  return Object.fromEntries(keyValuePairs) as {
     [key in BufferKeysV1 | BufferKeysV2]: number;
   };
 }

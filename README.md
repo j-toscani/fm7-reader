@@ -48,4 +48,4 @@ Here, set the folowing Options:
 
 ## Status
 
-The Data stream gets outputted to the console but is unreadable.
+Data gets broadcasted to all connected Websockets.
