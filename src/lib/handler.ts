@@ -3,7 +3,7 @@ import base from "../assets/base";
 import all from "../assets/all";
 import decodeBuffer from "./decodeBuffer";
 
-import wsServer from "../websocket";
+import ws from "../websocket";
 
 
 export function onMessage(message: Buffer, _remote: RemoteInfo) {
@@ -11,9 +11,8 @@ export function onMessage(message: Buffer, _remote: RemoteInfo) {
 
   const decodedBuffer = decodeBuffer(message, toDecode);
 
-  wsServer.connections.forEach(connection => {
-    const data = JSON.stringify(decodedBuffer);
-    connection.sendUTF(data);
+  ws.clients.forEach((client: any) => {
+    client.send(decodedBuffer);
   })
 }
 
