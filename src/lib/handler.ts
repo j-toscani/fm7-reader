@@ -5,15 +5,27 @@ import decodeBuffer from "./decodeBuffer";
 
 import wsServer from "../websocket";
 
+let last = new Date();
 
-export function onMessage(message: Buffer, _remote: RemoteInfo) {
+export function onMessage(message: Buffer, remote: RemoteInfo) {
   const toDecode = message.byteLength > 232 ? all : base;
-
   const decodedBuffer = decodeBuffer(message, toDecode);
 
-  wsServer.connections.forEach(connection => {
-    const data = JSON.stringify(decodedBuffer);
-    connection.sendUTF(data);
-  })
+  if (shouldBroadcast(50)) {
+    console.log(new Date().getTime());
+    broadcastString(decodedBuffer);
+    last = new Date();
+  }
 }
 
+function broadcastString(data: any) {
+  wsServer.connections.forEach((connection) => {
+    const stringifiedData = JSON.stringify(data);
+    connection.sendUTF(stringifiedData);
+  });
+}
+
+function shouldBroadcast(interval: number) {
+  const now = new Date();
+  return now.getTime() - last.getTime() > interval;
+}
