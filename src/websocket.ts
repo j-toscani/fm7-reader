@@ -1,7 +1,8 @@
-import { server as WebSocketServer, connection } from "websocket";
 import http from "http";
+import { server as WebSocketServer } from "websocket";
+import { createHandleWsClose } from "./lib/handlerFactories";
 
-var server = http.createServer(function (request, response) {
+const server = http.createServer(function (request, response) {
   console.log(new Date() + " Received request for " + request.url);
   response.writeHead(404);
   response.end();
@@ -31,34 +32,9 @@ wsServer.on("request", function (request) {
     return;
   }
 
-  const connection = getConnection(request);
-  console.log(new Date() + " Connection accepted.");
-  connection.on("message", createHandleMessage(connection));
+  const connection = request.accept("echo-protocol", request.origin);
+
   connection.on("close", createHandleWsClose(connection));
 });
 
-function getConnection(request: any): connection {
-  return request.accept("echo-protocol", request.origin);
-}
-
-function createHandleMessage(connection: connection) {
-  return (message: any) => {
-    if (message.type === "utf8") {
-      console.log("Received Message: " + message.utf8Data);
-      connection.sendUTF(message.utf8Data);
-    } else if (message.type === "binary") {
-      console.log(
-        "Received Binary Message of " + message.binaryData.length + " bytes"
-      );
-      connection.sendBytes(message.binaryData);
-    }
-  };
-}
-
-function createHandleWsClose(connection: connection) {
-  return (reasonCode: number, description: string) => {
-    console.log(
-      new Date() + " Peer " + connection.remoteAddress + " disconnected."
-    );
-  };
-}
+export default wsServer;
