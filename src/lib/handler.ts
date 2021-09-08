@@ -5,7 +5,7 @@ import decodeBuffer from "./decodeBuffer";
 import fs from "fs";
 import path from "path";
 
-import wsServer from "../websocket";
+// import wsServer from "../websocket";
 import { WriteStream } from "fs";
 
 let last = new Date();
@@ -30,7 +30,10 @@ export function onMessage(message: Buffer, remote: RemoteInfo) {
       canStream: true,
     };
 
-    stream.on("finish", () => delete streams[remote.address]);
+    stream.on("finish", () => {
+      delete streams[remote.address];
+      console.log("finished writing for: ", remote.address + ".csv");
+    });
   }
 
   const values = decodedBuffer.map(([_key, value]) => value).join(",");
@@ -52,8 +55,8 @@ function shouldBroadcast(interval: number) {
   return now.getTime() - last.getTime() > interval;
 }
 
-function broadcastDecodedBuffer(buffer: ReturnType<typeof decodeBuffer>) {
-  wsServer.clients.forEach((client: any) => {
-    client.send(buffer);
-  });
-}
+// function broadcastDecodedBuffer(buffer: ReturnType<typeof decodeBuffer>) {
+//   wsServer.clients.forEach((client: any) => {
+//     client.send(buffer);
+//   });
+// }

@@ -1,5 +1,5 @@
 import { Socket } from "dgram";
-import { connection } from "websocket";
+// import { connection } from "websocket";
 
 export function createOnListening(server: Socket) {
   return () => {
@@ -9,10 +9,10 @@ export function createOnListening(server: Socket) {
   };
 }
 
-export function createHandleWsClose(connection: connection) {
-  return () => {
-    const { remoteAddress } = connection;
-    const message = new Date() + " Peer " + remoteAddress + " disconnected.";
-    console.log(message);
-  };
-}
+// export function createHandleWsClose(connection: connection) {
+//   return () => {
+//     const { remoteAddress } = connection;
+//     const message = new Date() + " Peer " + remoteAddress + " disconnected.";
+//     console.log(message);
+//   };
+// }
