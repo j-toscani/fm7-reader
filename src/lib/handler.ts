@@ -47,14 +47,13 @@ function writeToFile(stream: WriteStream, message: string) {
   return stream.write(message);
 }
 
-function broadcastString(data: any) {
-  wsServer.connections.forEach((connection) => {
-    const stringifiedData = JSON.stringify(data);
-    connection.sendUTF(stringifiedData);
-  });
-}
-
 function shouldBroadcast(interval: number) {
   const now = new Date();
   return now.getTime() - last.getTime() > interval;
+}
+
+function broadcastDecodedBuffer(buffer: ReturnType<typeof decodeBuffer>) {
+  wsServer.clients.forEach((client: any) => {
+    client.send(buffer);
+  });
 }
