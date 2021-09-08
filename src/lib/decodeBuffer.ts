@@ -11,9 +11,7 @@ export default function decodeBuffer(message: Buffer, toDecode: V1 | V2) {
     return [option.property, value];
   });
 
-  return Object.fromEntries(keyValuePairs) as {
-    [key in BufferKeysV1 | BufferKeysV2]: number;
-  };
+  return keyValuePairs;
 }
 
 function getNextByteToRead(prev: number, encoding: EncodingsV2) {
@@ -29,17 +27,17 @@ function createDecoder(message: Buffer) {
 
     switch (option.encoding) {
       case "f32":
-        return message.readFloatBE(byteToRead);
+        return message.readFloatLE(byteToRead);
       case "u32":
-        return message.readInt32LE(byteToRead);
+        return message.readUInt32LE(byteToRead);
       case "u16":
-        return message.readInt16LE(byteToRead);
+        return message.readUInt16LE(byteToRead);
       case "s8":
         return message.readInt8(byteToRead);
       case "u8":
         return message.readUInt8(byteToRead);
       case "s32":
-        return message.readInt32BE(byteToRead);
+        return message.readInt32LE(byteToRead);
       default:
         throw Error("Unknown decoding");
     }
