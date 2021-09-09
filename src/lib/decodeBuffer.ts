@@ -1,10 +1,14 @@
-import { BufferKeysV1, BufferKeysV2, EncodingsV2, V1, V2 } from "../types";
+import { EncodingsV2, V2 } from "../types";
 
-export default function decodeBuffer(message: Buffer, toDecode: V1 | V2) {
-  let byteToRead = 0;
+import base from "../assets/base";
+import all from "../assets/all";
+
+export default function decodeBuffer(message: Buffer) {
+  const optionsToDecode = getOptionsToDecode(message);
   const decoder = createDecoder(message);
+  let byteToRead = 0;
 
-  const keyValuePairs = toDecode.map((option) => {
+  const keyValuePairs = optionsToDecode.map((option) => {
     const value = decoder(option, byteToRead);
     byteToRead = getNextByteToRead(byteToRead, option.encoding);
 
@@ -16,6 +20,10 @@ export default function decodeBuffer(message: Buffer, toDecode: V1 | V2) {
 
 function getNextByteToRead(prev: number, encoding: EncodingsV2) {
   return prev + parseInt(encoding.slice(1)) / 8;
+}
+
+function getOptionsToDecode(message: Buffer) {
+  return message.byteLength > 232 ? all : base;
 }
 
 function createDecoder(message: Buffer) {

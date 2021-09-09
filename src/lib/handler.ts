@@ -1,62 +1,35 @@
 import { RemoteInfo } from "dgram";
-import base from "../assets/base";
-import all from "../assets/all";
+
 import decodeBuffer from "./decodeBuffer";
-import fs from "fs";
-import path from "path";
+import { RaceDataStream } from "./RaceDataStream";
 
-// import wsServer from "../websocket";
-import { WriteStream } from "fs";
-
-let last = new Date();
-const streams: { [key: string]: { stream: WriteStream; canStream: boolean } } =
-  {};
+const streams: { [key: string]: RaceDataStream } = {};
 
 export function onMessage(message: Buffer, remote: RemoteInfo) {
-  const toDecode = message.byteLength > 232 ? all : base;
-  const decodedBuffer = decodeBuffer(message, toDecode);
+  const decodedBuffer = decodeBuffer(message);
+  const stream = streams[remote.address];
 
-  if (!decodedBuffer[0][1] || !shouldBroadcast(500)) {
+  if (!decodedBuffer[0][1] && stream) {
+    stream.stop();
     return;
   }
 
-  if (!streams[remote.address]) {
-    const stream = fs.createWriteStream(
-      path.resolve(__dirname, "../../race_data/", remote.address + ".csv")
-    );
-
-    streams[remote.address] = {
-      stream,
-      canStream: true,
-    };
-
-    stream.on("finish", () => {
-      delete streams[remote.address];
-      console.log("finished writing for: ", remote.address + ".csv");
-    });
+  if (!decodedBuffer[0][1] || !stream.shouldWrite(500)) {
+    return;
   }
 
-  const values = decodedBuffer.map(([_key, value]) => value).join(",");
+  if (!stream) {
+    streams[remote.address] = new RaceDataStream(remote);
+  }
 
-  streams[remote.address].canStream = writeToFile(
-    streams[remote.address].stream,
-    values + "\n"
-  );
-  // broadcastString(decodedBuffer);
-  last = new Date();
+  if (stream.canStream) {
+    const values = decodedBufferToString(decodedBuffer);
+    stream.write(values);
+  } else {
+    stream.haltToDrain();
+  }
 }
 
-function writeToFile(stream: WriteStream, message: string) {
-  return stream.write(message);
+function decodedBufferToString(decoded: ReturnType<typeof decodeBuffer>) {
+  return decoded.map(([_key, value]) => value).join(",");
 }
-
-function shouldBroadcast(interval: number) {
-  const now = new Date();
-  return now.getTime() - last.getTime() > interval;
-}
-
-// function broadcastDecodedBuffer(buffer: ReturnType<typeof decodeBuffer>) {
-//   wsServer.clients.forEach((client: any) => {
-//     client.send(buffer);
-//   });
-// }
