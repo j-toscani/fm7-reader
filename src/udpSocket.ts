@@ -11,6 +11,6 @@ server.on("listening", createOnListening(server));
 
 server.on("message", onMessage);
 
-export function startServer() {
+export function startUdpSocket() {
   server.bind(PORT, HOST);
 }
