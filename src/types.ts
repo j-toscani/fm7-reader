@@ -1,10 +1,5 @@
 import base from "./assets/base";
-import add from "./assets/add";
-
-const all = {
-  ...base,
-  ...add,
-} as const;
+import all from "./assets/all";
 
 export type V1 = typeof base;
 export type V2 = typeof all;

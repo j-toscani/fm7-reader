@@ -1,3 +1,3 @@
-import { startServer } from "./server";
+import { startUdpSocket } from "./udpSocket";
 
-startServer();
+startUdpSocket();
