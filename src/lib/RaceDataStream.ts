@@ -7,11 +7,17 @@ export class RaceDataStream {
   stream: WriteStream;
   last: Date;
 
-  constructor(remote: RemoteInfo) {
+  constructor(remote: RemoteInfo, onFinish: () => void) {
     const stream = fs.createWriteStream(
       path.resolve(__dirname, "../../race_data/", remote.address + ".csv"),
       { flags: "a" }
     );
+
+    stream.on("drain", () => (this.canStream = true));
+    stream.on("finish", () => {
+      onFinish();
+      console.log(remote.address, ": disconnected.");
+    });
 
     this.canStream = true;
     this.stream = stream;
@@ -35,9 +41,5 @@ export class RaceDataStream {
 
   write(message: string) {
     this.canStream = this.stream.write(message);
-  }
-
-  haltToDrain() {
-    this.stream.on("drain", () => (this.canStream = true));
   }
 }

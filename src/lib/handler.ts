@@ -7,29 +7,29 @@ const streams: { [key: string]: RaceDataStream } = {};
 
 export function onMessage(message: Buffer, remote: RemoteInfo) {
   const decodedBuffer = decodeBuffer(message);
-  const stream = streams[remote.address];
+  let stream = streams[remote.address];
 
   if (!decodedBuffer[0][1] && stream) {
     stream.stop();
     return;
   }
 
-  if (!decodedBuffer[0][1] || !stream.shouldWrite(500)) {
+  if (!decodedBuffer[0][1] || (stream && !stream.shouldWrite(500))) {
     return;
   }
 
   if (!stream) {
-    streams[remote.address] = new RaceDataStream(remote);
+    const onFinish = () => delete streams[remote.address];
+    streams[remote.address] = new RaceDataStream(remote, onFinish);
+    stream = streams[remote.address];
   }
 
   if (stream.canStream) {
     const values = decodedBufferToString(decodedBuffer);
     stream.write(values);
-  } else {
-    stream.haltToDrain();
   }
 }
 
 function decodedBufferToString(decoded: ReturnType<typeof decodeBuffer>) {
-  return decoded.map(([_key, value]) => value).join(",");
+  return decoded.map(([_key, value]) => value).join(",") + "\n";
 }
