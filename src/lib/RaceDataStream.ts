@@ -61,7 +61,7 @@ export class RaceDataStream {
 function createFileName(remote: RemoteInfo) {
   const ip = remote.address;
   const formatter = createFormatter();
-  return `${ip}_${formatter.format(new Date())}.csv`;
+  return `${formatter.format(new Date())}_${ip}.csv`;
 }
 
 function createFormatter() {
