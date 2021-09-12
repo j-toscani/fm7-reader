@@ -27,6 +27,7 @@ export function onMessage(message: Buffer, remote: RemoteInfo) {
 
   if (!stream) {
     streams[remote.address] = createStream(remote);
+    stream = streams[remote.address];
   }
 
   if (stream.canStream) {
