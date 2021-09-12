@@ -9,7 +9,7 @@ const logger = createLogger({
     }),
     format.errors({ stack: true }),
     format.splat(),
-    format.json()
+    format.simple()
   ),
   defaultMeta: { service: "logger" },
   transports: [

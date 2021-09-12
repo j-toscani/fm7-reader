@@ -1,6 +1,7 @@
 import dgram from "dgram";
 import { onMessage } from "./lib/onMessage";
 import { createOnListening } from "./lib/createOnListening";
+import logger from "./utils/logger";
 
 const server = dgram.createSocket("udp4");
 
@@ -11,6 +12,4 @@ server.on("listening", createOnListening(server));
 
 server.on("message", onMessage);
 
-export function startUdpSocket() {
-  server.bind(PORT, HOST);
-}
+server.bind(PORT, HOST);
