@@ -1,5 +1,5 @@
 import dgram from "dgram";
-import { onMessage } from "./lib/handler";
+import { onMessage } from "./lib/onMessage";
 import { createOnListening } from "./lib/createOnListening";
 
 const server = dgram.createSocket("udp4");
