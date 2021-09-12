@@ -3,9 +3,8 @@ import { EncodingsV2, V2 } from "../types";
 import base from "../assets/base";
 import all from "../assets/all";
 
-export default function decodeBuffer(message: Buffer) {
+export default function decodeBuffer(message: Buffer, decoder: Decoder) {
   const optionsToDecode = getOptionsToDecode(message);
-  const decoder = createDecoder(message);
   let byteToRead = 0;
 
   const keyValuePairs = optionsToDecode.map((option) => {
@@ -26,7 +25,12 @@ function getOptionsToDecode(message: Buffer) {
   return message.byteLength > 232 ? all : base;
 }
 
-function createDecoder(message: Buffer) {
+export function isGameRunning(message: Buffer, decoder: Decoder) {
+  const options = getOptionsToDecode(message);
+  return decoder(options[0], 0);
+}
+
+export function createDecoder(message: Buffer) {
   return (option: V2[number], byteToRead: number) => {
     if (byteToRead >= message.byteLength) {
       console.error("Exceeded byte length!");
@@ -51,3 +55,5 @@ function createDecoder(message: Buffer) {
     }
   };
 }
+
+export type Decoder = ReturnType<typeof createDecoder>;

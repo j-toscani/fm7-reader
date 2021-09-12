@@ -5,12 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "convert": "ts-node ./src/converter/index.ts",
-    "test:socket": "ts-node ./src/websocket.ts",
-    "watch": "tsc --watch",
     "start": "node ./dist",
-    "start:dev": "ts-node ./src/index.ts",
-    "dev": "nodemon ./dist"
+    "dev": "nodemon ./src/index.ts"
   },
   "repository": {
     "type": "git",
@@ -25,12 +21,11 @@
   "homepage": "https://github.com/j-toscani/fm7-reader#readme",
   "devDependencies": {
     "@types/node": "^16.7.10",
-    "@types/ws": "^7.4.7",
     "nodemon": "^2.0.12",
     "ts-node": "^10.2.1",
     "typescript": "^4.4.2"
   },
   "dependencies": {
-    "ws": "7.4"
+    "winston": "^3.3.3"
   }
 }
