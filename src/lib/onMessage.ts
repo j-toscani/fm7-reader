@@ -26,7 +26,7 @@ export function onMessage(message: Buffer, remote: RemoteInfo) {
   }
 
   if (!stream) {
-    createStream(remote);
+    streams[remote.address] = createStream(remote);
   }
 
   if (stream.canStream) {
@@ -36,8 +36,7 @@ export function onMessage(message: Buffer, remote: RemoteInfo) {
 
 function createStream(remote: RemoteInfo) {
   const onFinish = () => delete streams[remote.address];
-  streams[remote.address] = new RaceDataStream(remote, onFinish);
-  return streams[remote.address];
+  return new RaceDataStream(remote, onFinish);
 }
 
 function getValues(message: Buffer, decoder: Decoder) {
