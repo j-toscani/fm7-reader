@@ -36,17 +36,38 @@ export class RaceDataStream {
   }
 
   private _setupStream(remote: RemoteInfo, onFinish: () => void) {
+    const filename = createFileName(remote);
+
     const stream = fs.createWriteStream(
-      path.resolve(__dirname, "../../race_data/", remote.address + ".csv"),
+      path.resolve(__dirname, "../../race_data/", filename),
       { flags: "a" }
     );
 
-    stream.on("drain", () => (this.canStream = true));
+    logger.info("Writing to %s", filename);
+
+    stream.on("drain", () => {
+      this.canStream = true;
+      logger.warn("%s buffer is draining!", remote.address);
+    });
     stream.on("finish", () => {
       onFinish();
-      logger.info("%s, disconnected at %s", remote.address, new Date());
+      logger.info("%s, disconnected at %s", remote.address);
     });
 
     return stream;
   }
+}
+
+function createFileName(remote: RemoteInfo) {
+  const ip = remote.address;
+  const formatter = createFormatter();
+  return `${ip}_${formatter.format(new Date())}.csv`;
+}
+
+function createFormatter() {
+  return new Intl.DateTimeFormat("en", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
 }
