@@ -1,6 +1,7 @@
 import { RemoteInfo } from "dgram";
 import fs, { WriteStream } from "fs";
 import path from "path";
+import logger from "../utils/logger";
 
 export class RaceDataStream {
   canStream: boolean;
@@ -43,7 +44,7 @@ export class RaceDataStream {
     stream.on("drain", () => (this.canStream = true));
     stream.on("finish", () => {
       onFinish();
-      console.log(remote.address, ": disconnected.");
+      logger.info("%s, disconnected at %s", remote.address, new Date());
     });
 
     return stream;

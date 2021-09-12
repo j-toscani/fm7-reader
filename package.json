@@ -25,12 +25,11 @@
   "homepage": "https://github.com/j-toscani/fm7-reader#readme",
   "devDependencies": {
     "@types/node": "^16.7.10",
-    "@types/ws": "^7.4.7",
     "nodemon": "^2.0.12",
     "ts-node": "^10.2.1",
     "typescript": "^4.4.2"
   },
   "dependencies": {
-    "ws": "7.4"
+    "winston": "^3.3.3"
   }
 }
