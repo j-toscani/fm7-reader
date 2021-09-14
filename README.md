@@ -48,4 +48,4 @@ Here, set the folowing Options:
 
 ## Status
 
-Data gets broadcasted to all connected Websockets.
+Writes recieved Data to `.csv`-Files on remote Server.
