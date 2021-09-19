@@ -14,12 +14,12 @@ const WS_PORT = parseInt(process.env.WS_PORT || "33333");
 const DB_URL = process.env.DB_URL || "mongodb://fm7-db:27017";
 const HOST = "0.0.0.0";
 
-server.on("listening", createOnListening(server));
-
-server.on("message", onMessage);
-
 socketServer.listen(WS_PORT, () =>
   logger.info({ message: `HTTP Server listening on Port ${WS_PORT}` })
 );
 
-connectToDb(DB_URL, () => server.bind(UDP_PORT, HOST));
+connectToDb(DB_URL, (connection) => {
+  server.on("listening", createOnListening(server));
+  server.on("message", (message, info) => onMessage(message, info, connection));
+  server.bind(UDP_PORT, HOST);
+});

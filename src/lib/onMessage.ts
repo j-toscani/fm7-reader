@@ -1,4 +1,5 @@
 import { RemoteInfo } from "dgram";
+import { Document, Collection } from "mongodb";
 
 import decodeBuffer, {
   createDecoder,
@@ -10,7 +11,11 @@ import { RaceDataStream } from "./RaceDataStream";
 
 const streams: { [key: string]: RaceDataStream } = {};
 
-export function onMessage(message: Buffer, remote: RemoteInfo) {
+export function onMessage(
+  message: Buffer,
+  remote: RemoteInfo,
+  collection: Collection<Document>
+) {
   let stream = streams[remote.address];
 
   if (stream && !stream.shouldWrite(500)) {
@@ -32,6 +37,17 @@ export function onMessage(message: Buffer, remote: RemoteInfo) {
 
   if (stream.canStream) {
     stream.write(getValues(message, decoder));
+
+    const toSave = {
+      $push: { data: [message] },
+      $currentDate: { lastModified: true },
+      id: stream.filename.slice(0, stream.filename.length - 4),
+    };
+
+    collection
+      .updateOne({ id: toSave.id }, toSave, { upsert: true })
+      .then(() => console.log(Date.now(), ": saved!"))
+      .catch((err) => console.error(err));
   }
 }
 

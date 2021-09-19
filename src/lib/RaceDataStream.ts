@@ -5,12 +5,13 @@ import logger from "../utils/logger";
 
 export class RaceDataStream {
   canStream: boolean;
+  filename: string;
   stream: WriteStream;
   last: Date;
 
   constructor(remote: RemoteInfo, onFinish: () => void) {
-    const stream = this._setupStream(remote, onFinish);
-
+    const [stream, filename] = this._setupStream(remote, onFinish);
+    this.filename = filename;
     this.canStream = true;
     this.stream = stream;
     this.last = new Date();
@@ -54,7 +55,7 @@ export class RaceDataStream {
       logger.info("%s, disconnected at %s", remote.address);
     });
 
-    return stream;
+    return [stream, filename] as const;
   }
 }
 
