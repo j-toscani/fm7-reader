@@ -1,19 +1,25 @@
 import dgram from "dgram";
-import socketServer from "./websocket";
+import dotenv from "dotenv";
+import logger from "./utils/logger";
+import socketServer from "./socket/websocket";
 import { onMessage } from "./lib/onMessage";
 import { createOnListening } from "./lib/createOnListening";
-import logger from "./utils/logger";
+import connectToDb from "./db";
+
+dotenv.config();
 
 const server = dgram.createSocket("udp4");
-
-const PORT = 33333;
+const UDP_PORT = parseInt(process.env.UDP_PORT || "33333");
+const WS_PORT = parseInt(process.env.WS_PORT || "33333");
+const DB_URL = process.env.DB_URL || "mongodb://fm7-db:27017";
 const HOST = "0.0.0.0";
 
 server.on("listening", createOnListening(server));
 
 server.on("message", onMessage);
 
-socketServer.listen(33332, () =>
-  logger.info({ message: "HTTP Server listening on Port 33332" })
+socketServer.listen(WS_PORT, () =>
+  logger.info({ message: `HTTP Server listening on Port ${WS_PORT}` })
 );
-server.bind(PORT, HOST);
+
+connectToDb(DB_URL, () => server.bind(UDP_PORT, HOST));

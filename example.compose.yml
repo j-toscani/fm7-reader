@@ -2,7 +2,7 @@ version: "3"
 
 services:
   fm7-reader:
-    image: ghcr.io/j-toscani/fm7-reader/fm7-reader:latest
+    image: fm7-reader
     container_name: fm7-reader
     restart: unless-stopped
     networks:
@@ -23,6 +23,7 @@ services:
       DB_USER: ${DB_USER}
       DB_PW: ${DB_PW}
       DB_PORT: ${DB_PORT}
+      DB_URL: mongodb://${DB_HOST}:${DB_PORT}
     networks:
       - fm7-network
     ports:
