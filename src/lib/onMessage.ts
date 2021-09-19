@@ -45,6 +45,8 @@ function getValues(message: Buffer, decoder: Decoder) {
   return decodedBufferToString(decodedBuffer);
 }
 
-function decodedBufferToString(decoded: ReturnType<typeof decodeBuffer>) {
+export function decodedBufferToString(
+  decoded: ReturnType<typeof decodeBuffer>
+) {
   return decoded.map(([_key, value]) => value).join(",") + "\n";
 }
