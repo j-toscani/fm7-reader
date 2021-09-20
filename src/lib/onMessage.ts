@@ -37,15 +37,15 @@ export function onMessage(
 
   if (stream.canStream) {
     stream.write(getValues(message, decoder));
-
+    const id = stream.filename.slice(0, stream.filename.length - 4);
     const toSave = {
       $push: { data: [message] },
       $currentDate: { lastModified: true },
-      id: stream.filename.slice(0, stream.filename.length - 4),
+      $set: { id },
     };
 
     collection
-      .updateOne({ id: toSave.id }, toSave, { upsert: true })
+      .updateOne({ id }, toSave, { upsert: true })
       .then(() => console.log(Date.now(), ": saved!"))
       .catch((err) => console.error(err));
   }
