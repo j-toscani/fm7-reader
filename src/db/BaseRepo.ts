@@ -1,28 +1,28 @@
-import { MongoClient } from "mongodb";
+import { getCollection } from ".";
 
 export class BaseRepo<T> {
-  client: MongoClient;
   collectionName: string;
 
-  constructor(client: MongoClient, collectionName: string) {
-    this.client = client;
+  constructor(collectionName: string) {
     this.collectionName = collectionName;
   }
 
   get collection() {
-    return this.client.db("fm7").collection(this.collectionName);
+    return getCollection<T>(this.collectionName);
   }
 
-  update(user: Partial<T>) {
-    this.collection.updateOne(user, { $set: user });
+  update(entry: Partial<T>) {
+    return this.collection.updateOne(entry, { $set: entry });
   }
-  get(user: Partial<T>) {
-    this.collection.findOne(user);
+  getOne(entry: Partial<T>) {
+    return this.collection.findOne(entry);
   }
-  create(user: T) {
-    this.collection.insertOne(user);
+  create(entry: T) {
+    // necessary because: https://github.com/DefinitelyTyped/DefinitelyTyped/issues/46375
+    //@ts-expect-error
+    return this.collection.insertOne(entry);
   }
-  delete(user: Partial<T>) {
-    this.collection.deleteOne(user);
+  delete(entry: Partial<T>) {
+    return this.collection.deleteOne(entry);
   }
 }

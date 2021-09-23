@@ -1,15 +1,18 @@
-import { MongoClient } from "mongodb";
+import { ObjectId } from "mongodb";
 import { BaseRepo } from "../BaseRepo";
 import { User } from "./User";
 
 export type RaceDataRaw = {
   user: User;
-  data: Buffer[];
+  data: Buffer[][];
+  started: Date;
+  ended?: Date;
+  _id?: ObjectId;
 };
 
-export default class RaceDataRepo extends BaseRepo<RaceDataRaw> {
-  constructor(client: MongoClient) {
-    super(client, "race_data_raw");
+export default class RaceDataRawRepo extends BaseRepo<RaceDataRaw> {
+  constructor() {
+    super("race_data_raw");
   }
   updateData(email: string, message: Buffer) {
     this.collection.updateOne(
