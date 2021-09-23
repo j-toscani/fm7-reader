@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import logger from "./utils/logger";
-import socketServer from "./socket/websocket";
+import socketServer from "./ws/websocket";
 import { connectDatabase } from "./db";
 
 dotenv.config();
