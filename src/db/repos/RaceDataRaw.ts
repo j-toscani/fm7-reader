@@ -3,7 +3,7 @@ import { BaseRepo } from "../BaseRepo";
 import { User } from "./User";
 
 export type RaceDataRaw = {
-  user: User;
+  user: Partial<User>;
   data: Buffer[][];
   started: Date;
   ended?: Date;
@@ -14,9 +14,9 @@ export default class RaceDataRawRepo extends BaseRepo<RaceDataRaw> {
   constructor() {
     super("race_data_raw");
   }
-  updateData(email: string, message: Buffer) {
+  updateData(email: string, started: Date, message: Buffer) {
     this.collection.updateOne(
-      { user: { email } },
+      { user: { email }, started },
       { $push: { data: [message] }, $currentDate: { lastModified: true } }
     );
   }
