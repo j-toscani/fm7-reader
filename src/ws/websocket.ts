@@ -3,10 +3,9 @@ import http from "http";
 // Error is expected as types are not correct! -> https://github.com/websockets/ws/issues/1932 -> https://github.com/DefinitelyTyped/DefinitelyTyped/pull/55151
 // @ts-expect-error
 import WebSocket, { WebSocketServer } from "ws";
-import UserRepo, { User } from "../db/repos/User";
+// import UserRepo, { User } from "../db/repos/User";
 import RaceDataRawRepo from "../db/repos/RaceDataRaw";
-
-const connections: { [key: string]: RaceDataRawRepo } = {};
+import logger from "../utils/logger";
 
 const socketServer = http.createServer((request, response) => {
   response.writeHead(404);
@@ -15,33 +14,34 @@ const socketServer = http.createServer((request, response) => {
 
 const wss = new WebSocketServer({ server: socketServer });
 
-function setUpWSS() {
-  wss.on("connection", async (ws: WebSocket, request: Request) => {
-    const user = await getUser(request);
-
-    if (user) {
-      ws.on("message", createOnMessage(user));
-      ws.on("close", () => {
-        delete connections[user.email];
-      });
-    }
+wss.on("connection", async (ws: WebSocket) => {
+  ws.on("message", createOnMessage());
+  ws.on("close", () => {
+    console.log("connection closed");
   });
-}
+});
 
-async function getUser(request: Request) {
-  const { email } = request.body;
-  const repo = new UserRepo();
-  return repo.getOne({ email });
-}
+function createOnMessage() {
+  let setUp = false;
+  let findBy = { email: "", started: new Date() };
+  let DataRepo: undefined | RaceDataRawRepo;
 
-function createOnMessage(user: User) {
-  const dataRepo = new RaceDataRawRepo();
-  connections[user.email] = dataRepo;
-  dataRepo.create({ user, data: [], started: new Date() });
-
-  return (message: Buffer | string) => {
-    if (message instanceof Buffer) {
-      dataRepo.updateData(user.email, message);
+  return (data: WebSocket.Data) => {
+    if (!setUp) {
+      findBy.email = data.toString();
+      DataRepo = new RaceDataRawRepo();
+      const newEntry = {
+        user: { email: findBy.email },
+        data: [],
+        started: new Date(),
+      };
+      DataRepo.create(newEntry);
+      logger.info(
+        [findBy.email, "started new session @", findBy.started].join("-")
+      );
+      setUp = true;
+    } else if (DataRepo) {
+      DataRepo?.updateData(findBy.email, findBy.started, data as Buffer);
     }
   };
 }
