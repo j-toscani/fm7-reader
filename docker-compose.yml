@@ -1,0 +1,51 @@
+version: "3"
+
+services:
+  fm7-reader:
+    image: fm7-reader
+    container_name: fm7-reader
+    restart: unless-stopped
+    networks:
+      - fm7-network
+    ports:
+      - "33333:33333/udp"
+    volumes:
+      - "./race_data:/app/race_data:rw"
+      - "./logs/fm7-reader:/app/logs:rw"
+
+  fm7-provider:
+    image: ghcr.io/j-toscani/fm7-provider/fm7-provider:latest
+    container_name: fm7-provider
+    restart: unless-stopped
+    environment:
+      DB_NAME: ${DB_NAME}
+      DB_HOST: ${DB_HOST}
+      DB_USER: ${DB_USER}
+      DB_PW: ${DB_PW}
+      DB_PORT: ${DB_PORT}
+      DB_URL: mongodb://${DB_USER}:${DB_PW}@fm7-db:27017/?authSource=admin`
+    networks:
+      - fm7-network
+    ports:
+      - "33332:33332"
+    volumes:
+      - "./race_data:/app/race_data:ro"
+
+  fm7-db:
+    image: mongo
+    container_name: fm7-db
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PW}
+    networks:
+      - fm7-network
+    volumes:
+      - "./db/data:/app/data/db"
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+
+networks:
+  fm7-network:
+    driver: bridge
