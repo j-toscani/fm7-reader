@@ -1,6 +1,7 @@
 import { getCollection } from ".";
+import { User } from "./repos/User";
 
-export class BaseRepo<T> {
+export abstract class BaseRepo<T> {
   collectionName: string;
 
   constructor(collectionName: string) {
