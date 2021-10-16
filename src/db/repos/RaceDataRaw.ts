@@ -1,9 +1,8 @@
 import { ObjectId } from "mongodb";
 import { BaseRepo } from "../BaseRepo";
-import { User } from "./User";
 
 export type RaceDataRaw = {
-  user: Partial<User>;
+  hash: string;
   data: Buffer[][];
   started: Date;
   ended?: Date;
@@ -14,9 +13,9 @@ export default class RaceDataRawRepo extends BaseRepo<RaceDataRaw> {
   constructor() {
     super("race_data_raw");
   }
-  updateData(email: string, started: Date, message: Buffer) {
+  updateData(hash: string, message: Buffer) {
     this.collection.updateOne(
-      { user: { email }, started },
+      { hash },
       { $push: { data: [message] }, $currentDate: { lastModified: true } }
     );
   }

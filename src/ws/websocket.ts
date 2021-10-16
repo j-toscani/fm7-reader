@@ -3,7 +3,6 @@ import http from "http";
 // Error is expected as types are not correct! -> https://github.com/websockets/ws/issues/1932 -> https://github.com/DefinitelyTyped/DefinitelyTyped/pull/55151
 // @ts-expect-error
 import WebSocket, { WebSocketServer } from "ws";
-// import UserRepo, { User } from "../db/repos/User";
 import RaceDataRawRepo from "../db/repos/RaceDataRaw";
 import logger from "../utils/logger";
 
@@ -12,38 +11,32 @@ const socketServer = http.createServer((request, response) => {
   response.end();
 });
 
-const wss = new WebSocketServer({ server: socketServer });
+const wss = new WebSocketServer({ noServer: true });
 
-wss.on("connection", async (ws: WebSocket) => {
-  ws.on("message", createOnMessage());
+const connections: { [key: string]: RaceDataRawRepo } = {};
+
+wss.on("connection", async (ws: WebSocket, request: Request) => {
+  const hash = request.url.slice(1);
+  logger.info(`Connection with hash ${hash} accepted.`);
+
+  ws.on("message", (message: Buffer) => onMessage(hash, message));
   ws.on("close", () => {
-    console.log("connection closed");
+    delete connections[hash];
+    logger.info(`Connection with hash ${hash} closed.`);
   });
 });
 
-function createOnMessage() {
-  let setUp = false;
-  let findBy = { email: "", started: new Date() };
-  let DataRepo: undefined | RaceDataRawRepo;
+function onMessage(hash: string, message: Buffer) {
+  let repo = connections[hash];
 
-  return (data: WebSocket.Data) => {
-    if (!setUp) {
-      findBy.email = data.toString();
-      DataRepo = new RaceDataRawRepo();
-      const newEntry = {
-        user: { email: findBy.email },
-        data: [],
-        started: new Date(),
-      };
-      DataRepo.create(newEntry);
-      logger.info(
-        [findBy.email, "started new session @", findBy.started].join("-")
-      );
-      setUp = true;
-    } else if (DataRepo) {
-      DataRepo?.updateData(findBy.email, findBy.started, data as Buffer);
-    }
-  };
+  if (!repo) {
+    const newRepo = new RaceDataRawRepo();
+    newRepo.create({ hash, data: [], started: new Date() });
+    logger.info(`Connection with hash ${hash} created.`);
+    repo = newRepo;
+  }
+
+  repo.updateData(hash, message);
 }
 
 export default socketServer;
