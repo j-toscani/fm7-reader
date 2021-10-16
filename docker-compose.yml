@@ -5,13 +5,6 @@ services:
     image: fm7-reader
     container_name: fm7-reader
     restart: unless-stopped
-    environment:
-      DB_NAME: ${DB_NAME}
-      DB_HOST: ${DB_HOST}
-      DB_USER: ${DB_USER}
-      DB_PW: ${DB_PW}
-      DB_PORT: ${DB_PORT}
-      DB_URL: mongodb://${DB_USER}:${DB_PW}@fm7-db:27017/?authSource=admin`
     networks:
       - fm7-network
     ports:
@@ -30,7 +23,7 @@ services:
       DB_USER: ${DB_USER}
       DB_PW: ${DB_PW}
       DB_PORT: ${DB_PORT}
-      DB_URL: mongodb://${DB_USER}:${DB_PW}@fm7-db:27017/?authSource=admin`
+      DB_URL: mongodb://${DB_USER}:${DB_PW}@fm7-db:27017/?authSource=admin
     networks:
       - fm7-network
     ports:

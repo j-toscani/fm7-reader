@@ -35,6 +35,7 @@ function onMessage(hash: string, message: Buffer) {
     newRepo.create({ hash, data: [], started: new Date() });
     logger.info(`Connection with hash ${hash} created.`);
     repo = newRepo;
+    connections[hash] = newRepo;
   }
 
   repo.updateData(hash, message);
