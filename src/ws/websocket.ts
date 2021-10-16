@@ -7,11 +7,12 @@ import RaceDataRawRepo from "../db/repos/RaceDataRaw";
 import logger from "../utils/logger";
 
 const socketServer = http.createServer((request, response) => {
+  console.log("Request: ", request.url);
   response.writeHead(404);
   response.end();
 });
 
-const wss = new WebSocketServer({ noServer: true });
+const wss = new WebSocketServer({ server: socketServer });
 
 const connections: { [key: string]: RaceDataRawRepo } = {};
 
