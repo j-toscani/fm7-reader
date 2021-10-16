@@ -8,7 +8,7 @@ services:
     networks:
       - fm7-network
     ports:
-      - "33333:33333/udp"
+      - "33332:33332"
     volumes:
       - "./race_data:/app/race_data:rw"
       - "./logs/fm7-reader:/app/logs:rw"
@@ -23,11 +23,11 @@ services:
       DB_USER: ${DB_USER}
       DB_PW: ${DB_PW}
       DB_PORT: ${DB_PORT}
-      DB_URL: mongodb://${DB_USER}:${DB_PW}@fm7-db:27017/?authSource=admin`
+      DB_URL: mongodb://${DB_USER}:${DB_PW}@fm7-db:27017/?authSource=admin
     networks:
       - fm7-network
     ports:
-      - "33332:33332"
+      - "33333:33333"
     volumes:
       - "./race_data:/app/race_data:ro"
 
