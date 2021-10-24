@@ -14,7 +14,8 @@ const socketServer = http.createServer((request, response) => {
 
 const wss = new WebSocketServer({ server: socketServer });
 
-const connections: { [key: string]: RaceDataRawRepo } = {};
+const connections: { [key: string]: { repo: RaceDataRawRepo; started: Date } } =
+  {};
 
 wss.on("connection", async (ws: WebSocket, request: Request) => {
   const hash = request.url.slice(1);
@@ -32,13 +33,15 @@ function onMessage(hash: string, message: Buffer) {
 
   if (!repo) {
     const newRepo = new RaceDataRawRepo();
-    newRepo.create({ hash, data: [], started: new Date() });
-    logger.info(`Connection with hash ${hash} created.`);
-    repo = newRepo;
-    connections[hash] = newRepo;
+    const started = new Date();
+
+    newRepo.create({ hash, data: [], started });
+    logger.info(`Connection with hash ${hash} created @ ${started}`);
+    repo = { repo: newRepo, started };
+    connections[hash] = repo;
   }
 
-  repo.updateData(hash, message);
+  repo.repo.updateData({ hash, started: repo.started }, message);
 }
 
 export default socketServer;

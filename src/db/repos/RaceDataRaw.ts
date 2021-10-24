@@ -13,10 +13,10 @@ export default class RaceDataRawRepo extends BaseRepo<RaceDataRaw> {
   constructor() {
     super("race_data_raw");
   }
-  updateData(hash: string, message: Buffer) {
-    this.collection.updateOne(
-      { hash },
-      { $push: { data: [message] }, $currentDate: { lastModified: true } }
-    );
+  updateData(query: { hash: string; started: Date }, message: Buffer) {
+    this.collection.updateOne(query, {
+      $push: { data: [message] },
+      $currentDate: { lastModified: true },
+    });
   }
 }
